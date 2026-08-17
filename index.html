@@ -1,0 +1,331 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Engro Enfrashare - Field Intelligence App</title>
+  <meta name="description" content="Access full site data, operator IDs, and infrastructure details from your phone. No Excel. No laptop." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green: #00a86b; --green-glow: rgba(0,168,107,0.25); --green-dim: rgba(0,168,107,0.12);
+      --bg: #060a08; --surface: rgba(14,22,18,0.92); --border: rgba(0,168,107,0.18);
+      --text: #ffffff; --text-secondary: #8fad9b; --radius: 16px;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); overflow-x: hidden; line-height: 1.6; }
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image: linear-gradient(rgba(0,168,107,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,168,107,0.04) 1px, transparent 1px);
+      background-size: 60px 60px; pointer-events: none; z-index: 0;
+    }
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between; padding: 16px 40px;
+      background: rgba(6,10,8,0.85); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border);
+    }
+    .nav-brand { font-size: 1.1rem; font-weight: 800; color: var(--green); text-decoration: none; }
+    .nav-cta {
+      background: var(--green); color: #fff; border: none; border-radius: 8px;
+      padding: 10px 22px; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .nav-cta:hover { background: #00c77e; transform: translateY(-1px); box-shadow: 0 6px 20px var(--green-glow); }
+    .hero {
+      position: relative; z-index: 1; min-height: 100vh;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      text-align: center; padding: 120px 24px 80px;
+    }
+    .badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--green-dim); border: 1px solid var(--border); border-radius: 100px;
+      padding: 6px 16px; font-size: 0.78rem; font-weight: 600; color: var(--green); margin-bottom: 28px;
+      animation: fadeUp 0.6s ease both;
+    }
+    .badge-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--green); box-shadow: 0 0 8px var(--green); animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.4} }
+    @keyframes fadeUp { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
+    .hero h1 {
+      font-size: clamp(2.6rem, 6vw, 5rem); font-weight: 900; line-height: 1.08;
+      letter-spacing: -0.04em; margin-bottom: 24px; animation: fadeUp 0.6s 0.1s ease both;
+    }
+    .accent { background: linear-gradient(135deg, #00a86b, #00e896); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .hero p { font-size: clamp(1rem, 2.2vw, 1.25rem); color: var(--text-secondary); max-width: 560px; margin-bottom: 48px; animation: fadeUp 0.6s 0.2s ease both; }
+    .hero-btns { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; animation: fadeUp 0.6s 0.3s ease both; }
+    .btn-primary {
+      display: flex; align-items: center; gap: 10px; background: var(--green); color: #fff;
+      border: none; border-radius: 12px; padding: 16px 32px; font-size: 1rem; font-weight: 700;
+      cursor: pointer; transition: all 0.25s; text-decoration: none;
+    }
+    .btn-primary:hover { background: #00c77e; transform: translateY(-2px); box-shadow: 0 12px 32px var(--green-glow); }
+    .btn-outline {
+      display: flex; align-items: center; gap: 8px; background: transparent; color: var(--text-secondary);
+      border: 1px solid var(--border); border-radius: 12px; padding: 16px 28px; font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: all 0.2s; text-decoration: none;
+    }
+    .btn-outline:hover { border-color: var(--green); color: var(--text); }
+    /* Phone mockup */
+    .phone-wrap { position: relative; margin-top: 64px; animation: fadeUp 0.7s 0.4s ease both; }
+    .phone-glow {
+      position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%);
+      width: 280px; height: 80px; background: var(--green); filter: blur(60px); opacity: 0.35; border-radius: 50%;
+    }
+    .phone {
+      width: 230px; background: #0e1612; border: 2px solid rgba(0,168,107,0.3);
+      border-radius: 36px; padding: 12px;
+      box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04);
+    }
+    .phone-screen { background: #090d0a; border-radius: 26px; overflow: hidden; aspect-ratio: 9/18.5; display: flex; flex-direction: column; }
+    .ph { background: rgba(0,168,107,0.1); border-bottom: 1px solid rgba(0,168,107,0.15); padding: 10px 12px; display: flex; align-items: center; gap: 8px; }
+    .ph-dot { width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg,#00a86b,#00e896); flex-shrink:0; }
+    .ph-title { font-size: 0.62rem; font-weight: 700; color: #fff; }
+    .ph-sub { font-size: 0.48rem; color: var(--text-secondary); }
+    .ph-search { margin: 8px 10px 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(0,168,107,0.15); border-radius: 7px; padding: 5px 9px; font-size: 0.52rem; color: var(--text-secondary); }
+    .ph-card { margin: 3px 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(0,168,107,0.12); border-radius: 9px; padding: 7px 9px; }
+    .ph-id { font-size: 0.58rem; font-weight: 700; color: var(--green); }
+    .ph-row { display: flex; justify-content: space-between; margin-top: 3px; }
+    .ph-lbl { font-size: 0.43rem; color: var(--text-secondary); }
+    .ph-val { font-size: 0.43rem; color: var(--text); font-weight: 600; }
+    /* Stats */
+    .stats { position: relative; z-index: 1; display: flex; justify-content: center; flex-wrap: wrap; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: var(--surface); backdrop-filter: blur(20px); }
+    .stat { flex: 1; min-width: 150px; padding: 32px 20px; text-align: center; border-right: 1px solid var(--border); }
+    .stat:last-child { border-right: none; }
+    .stat-n { font-size: 2.2rem; font-weight: 900; color: var(--green); line-height: 1; }
+    .stat-l { font-size: 0.8rem; color: var(--text-secondary); margin-top: 6px; font-weight: 500; }
+    /* Sections */
+    section { position: relative; z-index: 1; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+    .sec-lbl { display: inline-flex; align-items: center; gap: 6px; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); margin-bottom: 16px; }
+    .sec-lbl::before { content: ''; width: 20px; height: 2px; background: var(--green); border-radius: 2px; }
+    h2.sec-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.15; margin-bottom: 16px; }
+    .sec-desc { font-size: 1rem; color: var(--text-secondary); max-width: 520px; margin-bottom: 52px; }
+    /* Problem/Solution */
+    .ps { padding: 100px 0; }
+    .ps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+    .ps-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 36px; backdrop-filter: blur(16px); }
+    .ps-card.p { border-color: rgba(239,68,68,0.2); }
+    .ps-card.s { border-color: rgba(0,168,107,0.3); }
+    .ps-icon { font-size: 2rem; margin-bottom: 16px; }
+    .ps-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
+    .ps-card.p h3 { color: #f87171; }
+    .ps-card.s h3 { color: var(--green); }
+    .ps-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .ps-list li { display: flex; align-items: flex-start; gap: 10px; font-size: 0.88rem; color: var(--text-secondary); }
+    /* Features */
+    .feat { padding: 100px 0; }
+    .feat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+    .feat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 32px; backdrop-filter: blur(16px); transition: all 0.25s; }
+    .feat-card:hover { border-color: rgba(0,168,107,0.4); transform: translateY(-4px); box-shadow: 0 20px 40px rgba(0,0,0,0.3); }
+    .feat-icon { width: 52px; height: 52px; background: var(--green-dim); border: 1px solid var(--border); border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 20px; }
+    .feat-card h3 { font-size: 1rem; font-weight: 700; margin-bottom: 8px; }
+    .feat-card p { font-size: 0.87rem; color: var(--text-secondary); line-height: 1.7; }
+    /* How */
+    .how { padding: 100px 0; background: rgba(0,168,107,0.03); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+    .steps { display: flex; flex-direction: column; gap: 0; max-width: 680px; margin: 0 auto; }
+    .step { display: flex; gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--border); }
+    .step:last-child { border-bottom: none; }
+    .step-n { flex-shrink: 0; width: 48px; height: 48px; border-radius: 50%; background: var(--green-dim); border: 1px solid rgba(0,168,107,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; font-weight: 800; color: var(--green); }
+    .step h3 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .step p { font-size: 0.88rem; color: var(--text-secondary); }
+    /* Download */
+    .dl-sec { padding: 100px 0; }
+    .dl-box {
+      background: linear-gradient(135deg, rgba(0,168,107,0.12), rgba(0,168,107,0.04));
+      border: 1px solid rgba(0,168,107,0.3); border-radius: 24px; padding: 64px 48px;
+      text-align: center; position: relative; overflow: hidden;
+    }
+    .dl-box::before { content: ''; position: absolute; top: -80px; right: -80px; width: 300px; height: 300px; background: radial-gradient(circle, rgba(0,168,107,0.15), transparent 70%); pointer-events: none; }
+    .dl-box h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 800; letter-spacing: -0.03em; margin-bottom: 16px; }
+    .dl-box p { font-size: 1rem; color: var(--text-secondary); max-width: 460px; margin: 0 auto 40px; }
+    .dl-btn {
+      display: inline-flex; align-items: center; gap: 14px; background: var(--green); color: #fff;
+      border: none; border-radius: 14px; padding: 20px 40px; font-size: 1.1rem; font-weight: 800;
+      cursor: pointer; transition: all 0.25s;
+    }
+    .dl-btn:hover { background: #00c77e; transform: translateY(-3px); box-shadow: 0 16px 40px rgba(0,168,107,0.4); }
+    .dl-btn-icon { font-size: 1.5rem; }
+    .dl-btn-sub { font-size: 0.7rem; font-weight: 500; opacity: 0.85; display: block; text-align: left; }
+    #dl-status { margin-top: 16px; font-size: 0.88rem; color: var(--green); font-weight: 600; min-height: 22px; }
+    .dl-meta { margin-top: 20px; font-size: 0.78rem; color: var(--text-secondary); display: flex; align-items: center; justify-content: center; gap: 16px; flex-wrap: wrap; }
+    .ver-badge { display: inline-block; background: var(--green-dim); border: 1px solid var(--border); border-radius: 100px; padding: 4px 14px; font-size: 0.78rem; font-weight: 600; color: var(--green); margin-bottom: 24px; }
+    /* Footer */
+    footer { position: relative; z-index: 1; border-top: 1px solid var(--border); padding: 32px 24px; text-align: center; color: var(--text-secondary); font-size: 0.82rem; }
+    footer strong { color: var(--green); }
+    @media(max-width:700px) { nav{padding:14px 20px} .ps-grid{grid-template-columns:1fr} .dl-box{padding:40px 24px} .stat{min-width:130px} }
+  </style>
+</head>
+<body>
+  <nav>
+    <a class="nav-brand" href="#">Engro Enfrashare</a>
+    <a class="nav-cta" href="#download">Download App</a>
+  </nav>
+
+  <section class="hero">
+    <div class="badge"><span class="badge-dot"></span>Now Available for Android</div>
+    <h1>Site Data.<br><span class="accent">Instantly. Anywhere.</span></h1>
+    <p>Full infrastructure details, operator IDs, and site status for every Engro Enfrashare tower — directly from your phone. No Excel. No laptop needed.</p>
+    <div class="hero-btns">
+      <a class="btn-primary" href="#download">📲 Download Free App</a>
+      <a class="btn-outline" href="#features">✦ See Features</a>
+    </div>
+    <div class="phone-wrap">
+      <div class="phone-glow"></div>
+      <div class="phone">
+        <div class="phone-screen">
+          <div class="ph">
+            <div class="ph-dot"></div>
+            <div><div class="ph-title">Engro Enfrashare</div><div class="ph-sub">Pakistan Leading Tower Co.</div></div>
+          </div>
+          <div class="ph-search">🔍  Search by Site ID...</div>
+          <div class="ph-card">
+            <div class="ph-id">▸ EE-3342 (NE Hub)</div>
+            <div class="ph-row"><span class="ph-lbl">Jazz ID</span><span class="ph-val">JZ-88312</span></div>
+            <div class="ph-row"><span class="ph-lbl">Telenor ID</span><span class="ph-val">TN-22901</span></div>
+            <div class="ph-row"><span class="ph-lbl">Status</span><span class="ph-val" style="color:#00a86b">Active</span></div>
+          </div>
+          <div class="ph-card" style="opacity:0.65">
+            <div class="ph-id">▸ EE-9447 (NE Hub)</div>
+            <div class="ph-row"><span class="ph-lbl">Zong ID</span><span class="ph-val">ZG-44123</span></div>
+            <div class="ph-row"><span class="ph-lbl">Solar</span><span class="ph-val">Yes — 4 KWA</span></div>
+          </div>
+          <div class="ph-card" style="opacity:0.3">
+            <div class="ph-id">▸ EE-1108 (Hub)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n">2,000+</div><div class="stat-l">Sites in Database</div></div>
+    <div class="stat"><div class="stat-n">4</div><div class="stat-l">Operators Covered</div></div>
+    <div class="stat"><div class="stat-n">0s</div><div class="stat-l">Time to Find a Site</div></div>
+    <div class="stat"><div class="stat-n">Free</div><div class="stat-l">For All Engro Staff</div></div>
+  </div>
+
+  <section class="ps">
+    <div class="container">
+      <div class="sec-lbl">Why This App</div>
+      <h2 class="sec-title">Stop wasting time<br>hunting for data</h2>
+      <p class="sec-desc">Field teams used to spend precious minutes searching Excel files for basic site information. That ends today.</p>
+      <div class="ps-grid">
+        <div class="ps-card p">
+          <div class="ps-icon">😤</div>
+          <h3>The Old Way</h3>
+          <ul class="ps-list">
+            <li>❌ Open laptop just to check one value in the field</li>
+            <li>❌ Scroll thousands of Excel rows to find a site</li>
+            <li>❌ Call colleagues for Zong or Jazz IDs</li>
+            <li>❌ Risk working with an outdated spreadsheet</li>
+            <li>❌ No connectivity = no data access</li>
+          </ul>
+        </div>
+        <div class="ps-card s">
+          <div class="ps-icon">🚀</div>
+          <h3>With the App</h3>
+          <ul class="ps-list">
+            <li>✅ Search any site instantly from your pocket</li>
+            <li>✅ Full Jazz, Telenor, Zong, Ufone IDs in one place</li>
+            <li>✅ Works offline — data stored on your phone</li>
+            <li>✅ Auto-updates silently when database is refreshed</li>
+            <li>✅ No login. No server. Just open and go.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="feat" id="features">
+    <div class="container">
+      <div class="sec-lbl">Features</div>
+      <h2 class="sec-title">Everything your team<br>needs in the field</h2>
+      <p class="sec-desc">Built specifically for Engro Enfrashare field engineers and managers.</p>
+      <div class="feat-grid">
+        <div class="feat-card"><div class="feat-icon">🔍</div><h3>Instant Site Search</h3><p>Type any Site ID and get full results in milliseconds. Data lives on your device — no internet needed.</p></div>
+        <div class="feat-card"><div class="feat-icon">📡</div><h3>All 4 Operator IDs</h3><p>See Jazz, Telenor, Zong, and Ufone IDs alongside their approved services in one clean card.</p></div>
+        <div class="feat-card"><div class="feat-icon">🏗️</div><h3>Full Infrastructure Data</h3><p>Solar KWA, DG status, DC shared info, security vendor, power status, and dependent sites — all there.</p></div>
+        <div class="feat-card"><div class="feat-icon">🎨</div><h3>13 Colour Themes</h3><p>Engro Green, Midnight Blue, Sunset Orange, Ocean Deep, Neon Pink and more — make it yours.</p></div>
+        <div class="feat-card"><div class="feat-icon">🔄</div><h3>Silent Auto-Updates</h3><p>When the admin refreshes the database, your app quietly receives new data in the background. No action needed.</p></div>
+        <div class="feat-card"><div class="feat-icon">🗼</div><h3>NE Hub Detection</h3><p>Sites categorised as NE Hub are clearly labelled so field teams can identify hub towers instantly.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="how">
+    <div class="container">
+      <div class="sec-lbl" style="display:flex;justify-content:center">How It Works</div>
+      <h2 class="sec-title" style="text-align:center;max-width:500px;margin:0 auto 52px">Up and running<br>in 3 taps</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step-n">1</div>
+          <div><h3>Download the APK</h3><p>Click the download button below. The latest APK downloads directly from our secure release server.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">2</div>
+          <div><h3>Install on Your Phone</h3><p>Open the file and tap Install. Android automatically overlays it on any existing version — no uninstall needed, your data and preferences are kept.</p></div>
+        </div>
+        <div class="step">
+          <div class="step-n">3</div>
+          <div><h3>Search and Go</h3><p>Open the app, type a Site ID, and instantly see all details. That's it — you're done.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="dl-sec" id="download">
+    <div class="container">
+      <div class="dl-box">
+        <div class="ver-badge" id="ver-label">Fetching latest version…</div>
+        <h2>Download Engro Enfrashare</h2>
+        <p>Free for all Engro Enfrashare staff. Works on any Android phone running Android 8 or later.</p>
+        <button class="dl-btn" onclick="downloadApk()">
+          <span class="dl-btn-icon">📲</span>
+          <span>Download for Android<span class="dl-btn-sub">APK · Installs over existing version</span></span>
+        </button>
+        <div id="dl-status"></div>
+        <div class="dl-meta">
+          <span>🔒 Official release server</span>
+          <span>🤖 Android 8.0+</span>
+          <span>⚡ Auto-updates via OTA</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Built by <strong>Hamza Tehseen Cheema</strong> for Engro Enfrashare field teams &nbsp;·&nbsp; Internal use only</p>
+  </footer>
+
+  <script>
+    let apkUrl = null;
+    async function fetchRelease() {
+      try {
+        const r = await fetch('https://api.github.com/repos/Techmastergojo/Engro-Connect/releases/latest', { headers: { 'Accept': 'application/vnd.github.v3+json' } });
+        const d = await r.json();
+        const apk = d.assets && d.assets.find(a => a.name.endsWith('.apk'));
+        if (apk) apkUrl = apk.browser_download_url;
+        const tag = d.tag_name || '';
+        document.getElementById('ver-label').textContent = tag ? ('Latest: ' + tag) : 'Latest Version';
+      } catch(e) {
+        document.getElementById('ver-label').textContent = 'Latest Version';
+        apkUrl = 'https://github.com/Techmastergojo/Engro-Connect/releases/latest';
+      }
+    }
+    function downloadApk() {
+      const s = document.getElementById('dl-status');
+      if (!apkUrl) { s.textContent = 'Fetching download link…'; fetchRelease().then(triggerDl); return; }
+      triggerDl();
+    }
+    function triggerDl() {
+      const s = document.getElementById('dl-status');
+      s.textContent = '⬇️ Download started! Open the file on your phone to install.';
+      const a = document.createElement('a'); a.href = apkUrl; a.download = ''; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      setTimeout(() => { s.innerHTML = '✅ Done! On your phone: <strong>tap the file → Install → Open</strong>'; }, 2000);
+    }
+    fetchRelease();
+    const obs = new IntersectionObserver(entries => { entries.forEach(e => { if(e.isIntersecting){ e.target.style.animation='fadeUp 0.6s ease both'; obs.unobserve(e.target); } }); }, {threshold:0.1});
+    document.querySelectorAll('.feat-card,.ps-card,.step').forEach(el => { el.style.opacity='0'; obs.observe(el); });
+  </script>
+</body>
+</html>
